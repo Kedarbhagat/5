@@ -1,0 +1,30 @@
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<stdio.h>
+int main(int argc, char **argv) {
+ int fd, nfd;
+ // Check if the correct number of command-line arguments is provided
+ if (argc < 2) {
+ printf("usage: %s pathname\n", argv[0]);
+ exit(1);
+ }
+ // Open the file specified in the command-line argument for writing
+ if ((fd = open(argv[1], O_WRONLY)) < 0) {
+ perror("Problem in opening the file");
+ exit(1);
+ }
+ // Duplicate the file descriptor using fcntl with F_DUPFD
+ if ((nfd = fcntl(fd, F_DUPFD, 0)) == -1) {
+ perror("Problem in duplicating fd");
+ exit(1);
+ }
+ // Print a message indicating that the file descriptor has been duplicated
+ printf("Fd %d duplicated with %d\n", fd, nfd);
+ // Close the original and duplicated file descriptors
+ close(fd);
+ close(nfd);
+ return 0;
+}
